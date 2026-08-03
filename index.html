@@ -130,6 +130,38 @@
             background: rgba(255, 255, 255, 0.03);
             border: 1px solid rgba(255, 255, 255, 0.05);
         }
+        /* Style Indikator Offline / Online */
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        .status-badge.online {
+            background-color: #d1fae5;
+            color: #065f46;
+        }
+        .status-badge.offline {
+            background-color: #fee2e2;
+            color: #991b1b;
+            animation: pulse 1.5s infinite;
+        }
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+        .online .status-dot { background-color: #10b981; }
+        .offline .status-dot { background-color: #ef4444; }
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
         .card-value {
             font-size: 2.2rem;
             font-weight: 700;
@@ -334,6 +366,10 @@
                 <span class="status-dot"></span>
                 <span>System Online</span>
             </div>
+            <div id="connection-status" class="status-badge online">
+                <span class="status-dot"></span>
+                <span id="status-text">ONLINE</span>
+            </div>
         </header>
         <!-- SENSOR GRID -->
         <main class="grid">
@@ -510,13 +546,28 @@
             <p>&copy; 2026 Smart Chicken Coop Controller. Didesain untuk ESP32 Web Server.</p>
         </footer>
     </div>
-    <script>
+   <script> 
+        function setConnectionState(isOnline) {
+            const statusBadge = document.getElementById('connection-status');
+            const statusText = document.getElementById('status-text');
+        if (statusBadge && statusText) {
+            if (isOnline) {
+                statusBadge.className = 'status-badge online';
+                statusText.innerText = 'ONLINE';
+            } else {
+                statusBadge.className = 'status-badge offline';
+                statusText.innerText = 'TERPUTUS (OFFLINE)';
+                }
+            }
+        }
         // Update Data Sensor berkala
         async function updateData() {
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 2500);
             try {
-                const response = await fetch('/api/data');
+                const response = await fetch('/api/data', { signal: controller.signal });
+                clearTimeout(timeoutId);
                 if (!response.ok) throw new Error('Network error');
-                
                 const data = await response.json();
                 
                 // Sensor 1 & 2
@@ -656,6 +707,7 @@
                 updateBtnActive('led', data.modeLED);
             } catch (err) {
                 console.error("Gagal memperbarui data sensor: ", err);
+                setConnectionState(false);
             }
         }
         
@@ -680,6 +732,7 @@
                 }
             } catch (err) {
                 console.error("Gagal mengirim perintah kontrol: ", err);
+                setConnectionState(false);
             }
         }
         // Loop update 2.0 detik

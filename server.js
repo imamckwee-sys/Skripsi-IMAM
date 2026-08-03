@@ -7,7 +7,6 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname)));
 
-// Storage data sementara di Cloud Server
 let sensorData = {
     suhu1: 0, suhu2: 0,
     hum1: 0, hum2: 0,
@@ -21,17 +20,22 @@ let sensorData = {
     modeLED: 0
 };
 
-// 1. Menampilkan Halaman Web Dashboard
+let lastSeen = 0; // Waktu terakhir ESP32 mengirim data
+
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
 });
 
-// 2. API untuk Web Dashboard membaca data sensor
+// API untuk Web Dashboard membaca data sensor & status ESP32
 app.get('/api/data', (req, res) => {
-    res.json(sensorData);
+    // Anggap ESP32 offline jika tidak ada kiriman data lebih dari 7 detik
+    const isEspOnline = (Date.now() - lastSeen) < 7000 && lastSeen !== 0;
+    res.json({
+        ...sensorData,
+        isEspOnline
+    });
 });
 
-// 3. API untuk Web Dashboard saat kamu menekan tombol kontrol
 app.get('/api/control', (req, res) => {
     const { device, mode } = req.query;
     const m = parseInt(mode);
@@ -41,9 +45,10 @@ app.get('/api/control', (req, res) => {
     res.send('OK');
 });
 
-// 4. API Khusus untuk ESP32 (Mengirim data sensor & menerima status mode tombol)
+// API saat ESP32 mengirim data
 app.post('/api/update', (req, res) => {
     sensorData = { ...sensorData, ...req.body };
+    lastSeen = Date.now(); // Catat jam/detik terakhir ESP32 mengirim data
     res.json({
         modeKipas: sensorData.modeKipas,
         modePenghangat: sensorData.modePenghangat,
