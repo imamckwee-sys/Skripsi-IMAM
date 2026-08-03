@@ -130,7 +130,6 @@
             background: rgba(255, 255, 255, 0.03);
             border: 1px solid rgba(255, 255, 255, 0.05);
         }
-        /* Style Indikator Offline / Online */
         .status-badge {
             display: inline-flex;
             align-items: center;
@@ -150,18 +149,8 @@
             color: #991b1b;
             animation: pulse 1.5s infinite;
         }
-        .status-dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-        }
         .online .status-dot { background-color: #10b981; }
         .offline .status-dot { background-color: #ef4444; }
-        @keyframes pulse {
-            0% { opacity: 1; }
-            50% { opacity: 0.5; }
-            100% { opacity: 1; }
-        }
         .card-value {
             font-size: 2.2rem;
             font-weight: 700;
@@ -211,7 +200,6 @@
             width: 0%;
             transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.4s ease;
         }
-        /* CONTROLS AREA */
         .controls-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -291,15 +279,12 @@
             cursor: pointer;
             transition: all 0.2s ease;
         }
-        .btn:hover {
-            color: var(--text-primary);
-        }
+        .btn:hover { color: var(--text-primary); }
         .btn.active {
             background: var(--accent-color);
             color: var(--text-primary);
             box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
         }
-        /* THRESHOLDS CARD */
         .threshold-list {
             display: flex;
             flex-direction: column;
@@ -315,16 +300,9 @@
             border-radius: 10px;
             border: 1px solid rgba(255, 255, 255, 0.02);
         }
-        .threshold-label {
-            color: var(--text-secondary);
-        }
-        .threshold-value {
-            font-weight: 600;
-        }
-        /* ANIMATIONS FOR SPECIFIC CARDS */
-        .spin-animation {
-            animation: spin 3s linear infinite;
-        }
+        .threshold-label { color: var(--text-secondary); }
+        .threshold-value { font-weight: 600; }
+        .spin-animation { animation: spin 3s linear infinite; }
         @keyframes spin {
             from { transform: rotate(0deg); }
             to { transform: rotate(360deg); }
@@ -333,7 +311,6 @@
             filter: drop-shadow(0 0 8px #fbbf24);
             color: #fbbf24 !important;
         }
-        /* FOOTER */
         .footer {
             text-align: center;
             padding: 20px 0;
@@ -371,6 +348,7 @@
                 <span id="status-text">ONLINE</span>
             </div>
         </header>
+
         <!-- SENSOR GRID -->
         <main class="grid">
             <!-- SUHU -->
@@ -391,6 +369,7 @@
                     <div id="progress-suhu" class="progress-bar"></div>
                 </div>
             </div>
+
             <!-- KELEMBAPAN -->
             <div class="card" id="card-hum">
                 <div class="card-header">
@@ -409,6 +388,7 @@
                     <div id="progress-hum" class="progress-bar"></div>
                 </div>
             </div>
+
             <!-- CAHAYA -->
             <div class="card" id="card-lux">
                 <div class="card-header">
@@ -427,6 +407,7 @@
                     <div id="progress-lux" class="progress-bar"></div>
                 </div>
             </div>
+
             <!-- GAS AMONIA -->
             <div class="card" id="card-gas">
                 <div class="card-header">
@@ -446,14 +427,15 @@
                 </div>
             </div>
         </main>
+
         <!-- CONTROL & THRESHOLD AREA -->
         <section class="controls-grid">
-            <!-- PANEL KONTROL ACTUATOR -->
             <div class="control-card">
                 <h3 class="control-title">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="8" rx="2" ry="2"></rect><rect x="2" y="14" width="20" height="8" rx="2" ry="2"></rect><line x1="6" y1="6" x2="6.01" y2="6"></line><line x1="6" y1="18" x2="6.01" y2="18"></line></svg>
                     Aktuator & Relay Kontrol
                 </h3>
+
                 <!-- KIPAS -->
                 <div style="margin-bottom: 20px;">
                     <div class="relay-status-row">
@@ -474,6 +456,7 @@
                         <button class="btn" id="btn-kipas-off" onclick="setMode('kipas', 2)">FORCE OFF</button>
                     </div>
                 </div>
+
                 <!-- PENGHANGAT -->
                 <div style="margin-bottom: 20px;">
                     <div class="relay-status-row">
@@ -494,6 +477,7 @@
                         <button class="btn" id="btn-penghangat-off" onclick="setMode('penghangat', 2)">FORCE OFF</button>
                     </div>
                 </div>
+
                 <!-- LED STRIP -->
                 <div>
                     <div class="relay-status-row">
@@ -515,6 +499,7 @@
                     </div>
                 </div>
             </div>
+
             <!-- DETAIL THRESHOLD -->
             <div class="control-card">
                 <h3 class="control-title">
@@ -541,26 +526,42 @@
                 </div>
             </div>
         </section>
+
         <!-- FOOTER -->
         <footer class="footer">
             <p>&copy; 2026 Smart Chicken Coop Controller. Didesain untuk ESP32 Web Server.</p>
         </footer>
     </div>
-   <script> 
+
+    <script>
         function setConnectionState(isOnline) {
             const statusBadge = document.getElementById('connection-status');
             const statusText = document.getElementById('status-text');
-        if (statusBadge && statusText) {
-            if (isOnline) {
-                statusBadge.className = 'status-badge online';
-                statusText.innerText = 'ONLINE';
-            } else {
-                statusBadge.className = 'status-badge offline';
-                statusText.innerText = 'TERPUTUS (OFFLINE)';
+            const statusCoop = document.querySelector('.status-coop');
+
+            if (statusBadge && statusText) {
+                if (isOnline) {
+                    statusBadge.className = 'status-badge online';
+                    statusText.innerText = 'ONLINE';
+                    if (statusCoop) {
+                        statusCoop.style.background = 'rgba(16, 185, 129, 0.1)';
+                        statusCoop.style.color = 'var(--success)';
+                        statusCoop.style.borderColor = 'rgba(16, 185, 129, 0.2)';
+                        statusCoop.innerHTML = '<span class="status-dot"></span><span>System Online</span>';
+                    }
+                } else {
+                    statusBadge.className = 'status-badge offline';
+                    statusText.innerText = 'OFFLINE';
+                    if (statusCoop) {
+                        statusCoop.style.background = 'rgba(239, 68, 68, 0.1)';
+                        statusCoop.style.color = 'var(--danger)';
+                        statusCoop.style.borderColor = 'rgba(239, 68, 68, 0.2)';
+                        statusCoop.innerHTML = '<span class="status-dot" style="background-color: var(--danger); box-shadow: 0 0 10px var(--danger);"></span><span>System Offline</span>';
+                    }
                 }
             }
         }
-        // Update Data Sensor berkala
+
         async function updateData() {
             const controller = new AbortController();
             const timeoutId = setTimeout(() => controller.abort(), 2500);
@@ -569,7 +570,10 @@
                 clearTimeout(timeoutId);
                 if (!response.ok) throw new Error('Network error');
                 const data = await response.json();
-                
+
+                // PERBAIKAN: Update indikator ONLINE/OFFLINE dari status data server
+                setConnectionState(data.isEspOnline);
+
                 // Sensor 1 & 2
                 document.getElementById('val-suhu-1').innerText = data.suhu1.toFixed(1);
                 document.getElementById('val-suhu-2').innerText = data.suhu2.toFixed(1);
@@ -591,7 +595,7 @@
                 document.getElementById('val-lux').innerText = avgLux.toFixed(0);
                 document.getElementById('val-gas').innerText = Math.round(avgGas);
 
-                // --- BADGE & BAR SUHU (Logic: DINGIN / PANAS jika salah satu melewatinya) ---
+                // --- BADGE & BAR SUHU ---
                 const bSuhu = document.getElementById('badge-suhu');
                 const pSuhu = document.getElementById('progress-suhu');
                 let pctSuhu = (avgSuhu / 40) * 100;
@@ -723,7 +727,6 @@
             else if (mode === 2) btnOff.classList.add('active');
         }
         
-        // Fungsi control mode
         async function setMode(device, mode) {
             try {
                 const response = await fetch(`/api/control?device=${device}&mode=${mode}`);
@@ -735,9 +738,8 @@
                 setConnectionState(false);
             }
         }
-        // Loop update 2.0 detik
+
         setInterval(updateData, 2000);
-        // Load pertama kali
         window.addEventListener('DOMContentLoaded', updateData);
     </script>
 </body>
