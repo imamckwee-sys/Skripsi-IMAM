@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Poultry Coop Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0b0f19;
+            --card-bg: rgba(22, 28, 45, 0.4);
+            --card-border: rgba(255, 255, 255, 0.05);
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --accent-color: #6366f1;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+        }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            background: radial-gradient(circle at top right, #1e1b4b, var(--bg-color));
+            color: var(--text-primary);
+            font-family: 'Outfit', system-ui, -apple-system, sans-serif;
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+        .container {
+            width: 100%;
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+        /* HEADER */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--card-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            padding: 20px 25px;
+            border-radius: 20px;
+            border: 1px solid var(--card-border);
+            margin-bottom: 25px;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.2);
+        }
+        .header h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(90deg, #818cf8, #a78bfa);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .status-coop {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            background: rgba(16, 185, 129, 0.1);
+            padding: 6px 14px;
+            border-radius: 99px;
+            color: var(--success);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+        }
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background-color: var(--success);
+            border-radius: 50%;
+            box-shadow: 0 0 10px var(--success);
+            animation: pulse 1.8s infinite;
+        }
+        @keyframes pulse {
+            0% { transform: scale(0.9); opacity: 0.6; }
+            50% { transform: scale(1.1); opacity: 1; box-shadow: 0 0 14px var(--success); }
+            100% { transform: scale(0.9); opacity: 0.6; }
+        }
+        /* GRID SENSOR */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+        .card {
+            background: var(--card-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-radius: 24px;
+            padding: 24px;
+            border: 1px solid var(--card-border);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(99, 102, 241, 0.25);
+            box-shadow: 0 12px 40px rgba(99, 102, 241, 0.12);
+        }
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+        .card-title {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            font-weight: 600;
+        }
+        .icon-wrapper {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .card-value {
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin-bottom: 6px;
+            letter-spacing: -0.02em;
+        }
+        .card-unit {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            font-weight: 400;
+        }
+        .sensor-splits {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            margin-bottom: 12px;
+            border-top: 1px solid rgba(255,255,255,0.03);
+            padding-top: 6px;
+        }
+        .sensor-splits span {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        .badge {
+            display: inline-block;
+            font-size: 0.75rem;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 8px;
+            text-transform: uppercase;
+        }
+        .badge-success { background: rgba(16, 185, 129, 0.12); color: var(--success); border: 1px solid rgba(16, 185, 129, 0.2); }
+        .badge-warning { background: rgba(245, 158, 11, 0.12); color: var(--warning); border: 1px solid rgba(245, 158, 11, 0.2); }
+        .badge-danger { background: rgba(239, 68, 68, 0.12); color: var(--danger); border: 1px solid rgba(239, 68, 68, 0.2); }
+        .progress-bg {
+            width: 100%;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            margin-top: 14px;
+            overflow: hidden;
+        }
+        .progress-bar {
+            height: 100%;
+            border-radius: 10px;
+            width: 0%;
+            transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.4s ease;
+        }
+        /* CONTROLS AREA */
+        .controls-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+        .control-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-radius: 24px;
+            padding: 24px;
+            border: 1px solid var(--card-border);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+        }
+        .control-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            padding-bottom: 10px;
+        }
+        .relay-status-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 18px;
+        }
+        .relay-info h4 {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+        .relay-info p {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+        .relay-badge {
+            font-size: 0.75rem;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 8px;
+            letter-spacing: 0.05em;
+            display: inline-block;
+        }
+        .relay-on {
+            background: rgba(16, 185, 129, 0.15);
+            color: var(--success);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            box-shadow: 0 0 10px rgba(16, 185, 129, 0.1);
+        }
+        .relay-off {
+            background: rgba(148, 163, 184, 0.1);
+            color: var(--text-secondary);
+            border: 1px solid rgba(148, 163, 184, 0.2);
+        }
+        .btn-group {
+            display: flex;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 12px;
+            padding: 3px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .btn {
+            flex: 1;
+            padding: 8px 12px;
+            border: none;
+            background: transparent;
+            color: var(--text-secondary);
+            font-family: inherit;
+            font-size: 0.8rem;
+            font-weight: 600;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .btn:hover {
+            color: var(--text-primary);
+        }
+        .btn.active {
+            background: var(--accent-color);
+            color: var(--text-primary);
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+        }
+        /* THRESHOLDS CARD */
+        .threshold-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .threshold-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.9rem;
+            background: rgba(0, 0, 0, 0.1);
+            padding: 8px 14px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.02);
+        }
+        .threshold-label {
+            color: var(--text-secondary);
+        }
+        .threshold-value {
+            font-weight: 600;
+        }
+        /* ANIMATIONS FOR SPECIFIC CARDS */
+        .spin-animation {
+            animation: spin 3s linear infinite;
+        }
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        .glow-bulb {
+            filter: drop-shadow(0 0 8px #fbbf24);
+            color: #fbbf24 !important;
+        }
+        /* FOOTER */
+        .footer {
+            text-align: center;
+            padding: 20px 0;
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            margin-top: 10px;
+        }
+        @media (max-width: 768px) {
+            body { padding: 10px; }
+            .header { padding: 15px 20px; }
+            .header h1 { font-size: 1.25rem; }
+            .grid { grid-template-columns: 1fr 1fr; }
+            .controls-grid { grid-template-columns: 1fr; }
+        }
+        @media (max-width: 480px) {
+            .grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- HEADER -->
+        <header class="header">
+            <div>
+                <h1>Kandang Ayam Smart Monitor</h1>
+                <p style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 4px;">ESP32 Redundant Sensors & Actuator Split</p>
+            </div>
+            <div class="status-coop">
+                <span class="status-dot"></span>
+                <span>System Online</span>
+            </div>
+        </header>
+        <!-- SENSOR GRID -->
+        <main class="grid">
+            <!-- SUHU -->
+            <div class="card" id="card-suhu">
+                <div class="card-header">
+                    <span class="card-title">Suhu</span>
+                    <div class="icon-wrapper">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-secondary"><path d="M14 4v10.54a4 4 0 1 1-4 0V4a2 2 0 0 1 4 0z"></path></svg>
+                    </div>
+                </div>
+                <div class="card-value"><span id="val-suhu">--.-</span><span class="card-unit">&deg;C</span></div>
+                <div class="sensor-splits">
+                    <div>S1: <span id="val-suhu-1">--.-</span>&deg;C</div>
+                    <div>S2: <span id="val-suhu-2">--.-</span>&deg;C</div>
+                </div>
+                <div><span id="badge-suhu" class="badge">Mengambil...</span></div>
+                <div class="progress-bg">
+                    <div id="progress-suhu" class="progress-bar"></div>
+                </div>
+            </div>
+            <!-- KELEMBAPAN -->
+            <div class="card" id="card-hum">
+                <div class="card-header">
+                    <span class="card-title">Kelembapan</span>
+                    <div class="icon-wrapper">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-secondary"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"></path></svg>
+                    </div>
+                </div>
+                <div class="card-value"><span id="val-hum">--</span><span class="card-unit">%</span></div>
+                <div class="sensor-splits">
+                    <div>S1: <span id="val-hum-1">--</span>%</div>
+                    <div>S2: <span id="val-hum-2">--</span>%</div>
+                </div>
+                <div><span id="badge-hum" class="badge">Mengambil...</span></div>
+                <div class="progress-bg">
+                    <div id="progress-hum" class="progress-bar"></div>
+                </div>
+            </div>
+            <!-- CAHAYA -->
+            <div class="card" id="card-lux">
+                <div class="card-header">
+                    <span class="card-title">Cahaya</span>
+                    <div class="icon-wrapper" id="icon-cahaya-wrapper">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-secondary" id="icon-cahaya"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+                    </div>
+                </div>
+                <div class="card-value"><span id="val-lux">--</span><span class="card-unit">Lx</span></div>
+                <div class="sensor-splits">
+                    <div>S1: <span id="val-lux-1">--</span>Lx</div>
+                    <div>S2: <span id="val-lux-2">--</span>Lx</div>
+                </div>
+                <div><span id="badge-lux" class="badge">Mengambil...</span></div>
+                <div class="progress-bg">
+                    <div id="progress-lux" class="progress-bar"></div>
+                </div>
+            </div>
+            <!-- GAS AMONIA -->
+            <div class="card" id="card-gas">
+                <div class="card-header">
+                    <span class="card-title">Gas Amonia</span>
+                    <div class="icon-wrapper">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-secondary"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+                    </div>
+                </div>
+                <div class="card-value"><span id="val-gas">--</span><span class="card-unit">ADC</span></div>
+                <div class="sensor-splits">
+                    <div>S1: <span id="val-gas-1">--</span></div>
+                    <div>S2: <span id="val-gas-2">--</span></div>
+                </div>
+                <div><span id="badge-gas" class="badge">Mengambil...</span></div>
+                <div class="progress-bg">
+                    <div id="progress-gas" class="progress-bar"></div>
+                </div>
+            </div>
+        </main>
+        <!-- CONTROL & THRESHOLD AREA -->
+        <section class="controls-grid">
+            <!-- PANEL KONTROL ACTUATOR -->
+            <div class="control-card">
+                <h3 class="control-title">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="8" rx="2" ry="2"></rect><rect x="2" y="14" width="20" height="8" rx="2" ry="2"></rect><line x1="6" y1="6" x2="6.01" y2="6"></line><line x1="6" y1="18" x2="6.01" y2="18"></line></svg>
+                    Aktuator & Relay Kontrol
+                </h3>
+                <!-- KIPAS -->
+                <div style="margin-bottom: 20px;">
+                    <div class="relay-status-row">
+                        <div class="relay-info">
+                            <h4>Kipas Exhaust</h4>
+                            <p>Suhu > 26 &deg;C ATAU Amonia > 700</p>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <div class="icon-wrapper" id="fan-icon-wrap" style="width: 32px; height: 32px; border-radius: 8px;">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" id="icon-fan"><path d="M10.85 12A3 3 0 1 1 12 10.85m-9.15 7h4.3a4 4 0 0 0 4-4v-4.3a4 4 0 0 0-4-4h-4.3a4 4 0 0 0-4 4v4.3a4 4 0 0 0 4 4zm18.3 0h-4.3a4 4 0 0 0-4-4v-4.3a4 4 0 0 0 4-4h4.3a4 4 0 0 0 4 4v4.3a4 4 0 0 0-4 4z"></path></svg>
+                            </div>
+                            <span id="status-kipas" class="relay-badge relay-off">OFF</span>
+                        </div>
+                    </div>
+                    <div class="btn-group">
+                        <button class="btn" id="btn-kipas-auto" onclick="setMode('kipas', 0)">OTOMATIS</button>
+                        <button class="btn" id="btn-kipas-on" onclick="setMode('kipas', 1)">FORCE ON</button>
+                        <button class="btn" id="btn-kipas-off" onclick="setMode('kipas', 2)">FORCE OFF</button>
+                    </div>
+                </div>
+                <!-- PENGHANGAT -->
+                <div style="margin-bottom: 20px;">
+                    <div class="relay-status-row">
+                        <div class="relay-info">
+                            <h4>Lampu Penghangat</h4>
+                            <p>Menjaga kehangatan (Suhu < 24 &deg;C)</p>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <div class="icon-wrapper" id="bulb-icon-wrap" style="width: 32px; height: 32px; border-radius: 8px;">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" id="icon-bulb"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A5 5 0 0 0 8 8c0 1 .5 2.5 1.5 3.5.7.8 1.3 1.5 1.5 2.5"></path><line x1="9" y1="18" x2="15" y2="18"></line><line x1="10" y1="22" x2="14" y2="22"></line></svg>
+                            </div>
+                            <span id="status-penghangat" class="relay-badge relay-off">OFF</span>
+                        </div>
+                    </div>
+                    <div class="btn-group">
+                        <button class="btn" id="btn-penghangat-auto" onclick="setMode('penghangat', 0)">OTOMATIS</button>
+                        <button class="btn" id="btn-penghangat-on" onclick="setMode('penghangat', 1)">FORCE ON</button>
+                        <button class="btn" id="btn-penghangat-off" onclick="setMode('penghangat', 2)">FORCE OFF</button>
+                    </div>
+                </div>
+                <!-- LED STRIP -->
+                <div>
+                    <div class="relay-status-row">
+                        <div class="relay-info">
+                            <h4>Lampu LED Strip</h4>
+                            <p>Menerangi kandang jika Cahaya < 4.0 Lx</p>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <div class="icon-wrapper" id="led-icon-wrap" style="width: 32px; height: 32px; border-radius: 8px;">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" id="icon-led"><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"></path></svg>
+                            </div>
+                            <span id="status-led" class="relay-badge relay-off">OFF</span>
+                        </div>
+                    </div>
+                    <div class="btn-group">
+                        <button class="btn" id="btn-led-auto" onclick="setMode('led', 0)">OTOMATIS</button>
+                        <button class="btn" id="btn-led-on" onclick="setMode('led', 1)">FORCE ON</button>
+                        <button class="btn" id="btn-led-off" onclick="setMode('led', 2)">FORCE OFF</button>
+                    </div>
+                </div>
+            </div>
+            <!-- DETAIL THRESHOLD -->
+            <div class="control-card">
+                <h3 class="control-title">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"></path></svg>
+                    Batas Parameter (Broiler 21-35 Hari)
+                </h3>
+                <div class="threshold-list">
+                    <div class="threshold-item">
+                        <span class="threshold-label">Suhu Ideal</span>
+                        <span class="threshold-value" style="color: #60a5fa;">24.0 &deg;C - 26.0 &deg;C</span>
+                    </div>
+                    <div class="threshold-item">
+                        <span class="threshold-label">Kelembapan Ideal</span>
+                        <span class="threshold-value" style="color: #34d399;">60% - 80%</span>
+                    </div>
+                    <div class="threshold-item">
+                        <span class="threshold-label">Intensitas Cahaya Min</span>
+                        <span class="threshold-value" style="color: #fbbf24;">4.0 Lux</span>
+                    </div>
+                    <div class="threshold-item">
+                        <span class="threshold-label">Kadar Gas Maks (MQ135 ADC)</span>
+                        <span class="threshold-value" style="color: #f87171;">700 ADC</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- FOOTER -->
+        <footer class="footer">
+            <p>&copy; 2026 Smart Chicken Coop Controller. Didesain untuk ESP32 Web Server.</p>
+        </footer>
+    </div>
+    <script>
+        // Update Data Sensor berkala
+        async function updateData() {
+            try {
+                const response = await fetch('/api/data');
+                if (!response.ok) throw new Error('Network error');
+                
+                const data = await response.json();
+                
+                // Sensor 1 & 2
+                document.getElementById('val-suhu-1').innerText = data.suhu1.toFixed(1);
+                document.getElementById('val-suhu-2').innerText = data.suhu2.toFixed(1);
+                document.getElementById('val-hum-1').innerText = Math.round(data.hum1);
+                document.getElementById('val-hum-2').innerText = Math.round(data.hum2);
+                document.getElementById('val-lux-1').innerText = data.lux1.toFixed(0);
+                document.getElementById('val-lux-2').innerText = data.lux2.toFixed(0);
+                document.getElementById('val-gas-1').innerText = data.gas1;
+                document.getElementById('val-gas-2').innerText = data.gas2;
+
+                // Rata-rata untuk tampilan utama
+                let avgSuhu = (data.suhu1 + data.suhu2) / 2;
+                let avgHum = (data.hum1 + data.hum2) / 2;
+                let avgLux = (data.lux1 + data.lux2) / 2;
+                let avgGas = (data.gas1 + data.gas2) / 2;
+
+                document.getElementById('val-suhu').innerText = avgSuhu.toFixed(1);
+                document.getElementById('val-hum').innerText = Math.round(avgHum);
+                document.getElementById('val-lux').innerText = avgLux.toFixed(0);
+                document.getElementById('val-gas').innerText = Math.round(avgGas);
+
+                // --- BADGE & BAR SUHU (Logic: DINGIN / PANAS jika salah satu melewatinya) ---
+                const bSuhu = document.getElementById('badge-suhu');
+                const pSuhu = document.getElementById('progress-suhu');
+                let pctSuhu = (avgSuhu / 40) * 100;
+                pSuhu.style.width = Math.min(100, Math.max(0, pctSuhu)) + '%';
+                
+                if (data.suhu1 < 24.0 || data.suhu2 < 24.0) {
+                    bSuhu.innerText = 'DINGIN';
+                    bSuhu.className = 'badge badge-warning';
+                    pSuhu.style.backgroundColor = '#fbbf24';
+                } else if (data.suhu1 > 26.0 || data.suhu2 > 26.0) {
+                    bSuhu.innerText = 'PANAS';
+                    bSuhu.className = 'badge badge-danger';
+                    pSuhu.style.backgroundColor = '#ef4444';
+                } else {
+                    bSuhu.innerText = 'NORMAL';
+                    bSuhu.className = 'badge badge-success';
+                    pSuhu.style.backgroundColor = '#10b981';
+                }
+
+                // --- BADGE & BAR HUMIDITY ---
+                const bHum = document.getElementById('badge-hum');
+                const pHum = document.getElementById('progress-hum');
+                pHum.style.width = Math.min(100, Math.max(0, avgHum)) + '%';
+                
+                if (data.hum1 < 60 || data.hum2 < 60) {
+                    bHum.innerText = 'KERING';
+                    bHum.className = 'badge badge-warning';
+                    pHum.style.backgroundColor = '#fbbf24';
+                } else if (data.hum1 > 80 || data.hum2 > 80) {
+                    bHum.innerText = 'BASAH';
+                    bHum.className = 'badge badge-danger';
+                    pHum.style.backgroundColor = '#ef4444';
+                } else {
+                    bHum.innerText = 'NORMAL';
+                    bHum.className = 'badge badge-success';
+                    pHum.style.backgroundColor = '#10b981';
+                }
+
+                // --- BADGE & BAR LUX ---
+                const bLux = document.getElementById('badge-lux');
+                const pLux = document.getElementById('progress-lux');
+                const iconCahaya = document.getElementById('icon-cahaya');
+                let pctLux = (avgLux / 100) * 100;
+                pLux.style.width = Math.min(100, Math.max(0, pctLux)) + '%';
+                
+                if (data.lux1 < 4.0 || data.lux2 < 4.0) {
+                    bLux.innerText = 'GELAP';
+                    bLux.className = 'badge badge-danger';
+                    pLux.style.backgroundColor = '#6366f1';
+                    iconCahaya.classList.remove('glow-bulb');
+                } else {
+                    bLux.innerText = 'TERANG';
+                    bLux.className = 'badge badge-success';
+                    pLux.style.backgroundColor = '#fbbf24';
+                    iconCahaya.classList.add('glow-bulb');
+                }
+
+                // --- BADGE & BAR AMONIA ---
+                const bGas = document.getElementById('badge-gas');
+                const pGas = document.getElementById('progress-gas');
+                let pctGas = (avgGas / 4095) * 100;
+                pGas.style.width = Math.min(100, Math.max(0, pctGas)) + '%';
+                
+                if (data.gas1 > 700 || data.gas2 > 700) {
+                    bGas.innerText = 'BAHAYA';
+                    bGas.className = 'badge badge-danger';
+                    pGas.style.backgroundColor = '#ef4444';
+                } else {
+                    bGas.innerText = 'AMAN';
+                    bGas.className = 'badge badge-success';
+                    pGas.style.backgroundColor = '#10b981';
+                }
+
+                // --- UPDATE ACTUATOR STATES ---
+                const sKipas = document.getElementById('status-kipas');
+                const sPenghangat = document.getElementById('status-penghangat');
+                const sLED = document.getElementById('status-led');
+                const fanIcon = document.getElementById('icon-fan');
+                const bulbIcon = document.getElementById('icon-bulb');
+                const ledIcon = document.getElementById('icon-led');
+
+                if (data.kipas) {
+                    sKipas.innerText = 'ON';
+                    sKipas.className = 'relay-badge relay-on';
+                    fanIcon.classList.add('spin-animation');
+                } else {
+                    sKipas.innerText = 'OFF';
+                    sKipas.className = 'relay-badge relay-off';
+                    fanIcon.classList.remove('spin-animation');
+                }
+                if (data.penghangat) {
+                    sPenghangat.innerText = 'ON';
+                    sPenghangat.className = 'relay-badge relay-on';
+                    bulbIcon.classList.add('glow-bulb');
+                } else {
+                    sPenghangat.innerText = 'OFF';
+                    sPenghangat.className = 'relay-badge relay-off';
+                    bulbIcon.classList.remove('glow-bulb');
+                }
+                if (data.led) {
+                    sLED.innerText = 'ON';
+                    sLED.className = 'relay-badge relay-on';
+                    ledIcon.classList.add('glow-bulb');
+                } else {
+                    sLED.innerText = 'OFF';
+                    sLED.className = 'relay-badge relay-off';
+                    ledIcon.classList.remove('glow-bulb');
+                }
+
+                // --- UPDATE BUTTON ACTIVE MODES ---
+                updateBtnActive('kipas', data.modeKipas);
+                updateBtnActive('penghangat', data.modePenghangat);
+                updateBtnActive('led', data.modeLED);
+            } catch (err) {
+                console.error("Gagal memperbarui data sensor: ", err);
+            }
+        }
+        
+        function updateBtnActive(device, mode) {
+            const btnAuto = document.getElementById(`btn-${device}-auto`);
+            const btnOn = document.getElementById(`btn-${device}-on`);
+            const btnOff = document.getElementById(`btn-${device}-off`);
+            btnAuto.classList.remove('active');
+            btnOn.classList.remove('active');
+            btnOff.classList.remove('active');
+            if (mode === 0) btnAuto.classList.add('active');
+            else if (mode === 1) btnOn.classList.add('active');
+            else if (mode === 2) btnOff.classList.add('active');
+        }
+        
+        // Fungsi control mode
+        async function setMode(device, mode) {
+            try {
+                const response = await fetch(`/api/control?device=${device}&mode=${mode}`);
+                if (response.ok) {
+                    updateData();
+                }
+            } catch (err) {
+                console.error("Gagal mengirim perintah kontrol: ", err);
+            }
+        }
+        // Loop update 2.0 detik
+        setInterval(updateData, 2000);
+        // Load pertama kali
+        window.addEventListener('DOMContentLoaded', updateData);
+    </script>
+</body>
+</html>
