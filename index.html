@@ -400,7 +400,6 @@
                 <div class="card-value"><span id="val-lux">--</span><span class="card-unit">Lx</span></div>
                 <div class="sensor-splits">
                     <div>S1: <span id="val-lux-1">--</span>Lx</div>
-                    <div>S2: <span id="val-lux-2">--</span>Lx</div>
                 </div>
                 <div><span id="badge-lux" class="badge">Mengambil...</span></div>
                 <div class="progress-bg">
@@ -580,14 +579,13 @@
                 document.getElementById('val-hum-1').innerText = Math.round(data.hum1);
                 document.getElementById('val-hum-2').innerText = Math.round(data.hum2);
                 document.getElementById('val-lux-1').innerText = data.lux1.toFixed(0);
-                document.getElementById('val-lux-2').innerText = data.lux2.toFixed(0);
                 document.getElementById('val-gas-1').innerText = data.gas1;
                 document.getElementById('val-gas-2').innerText = data.gas2;
 
                 // Rata-rata untuk tampilan utama
                 let avgSuhu = (data.suhu1 + data.suhu2) / 2;
                 let avgHum = (data.hum1 + data.hum2) / 2;
-                let avgLux = (data.lux1 + data.lux2) / 2;
+                let avgLux = data.lux1;
                 let avgGas = (data.gas1 + data.gas2) / 2;
 
                 document.getElementById('val-suhu').innerText = avgSuhu.toFixed(1);
@@ -641,7 +639,7 @@
                 let pctLux = (avgLux / 100) * 100;
                 pLux.style.width = Math.min(100, Math.max(0, pctLux)) + '%';
                 
-                if (data.lux1 < 4.0 || data.lux2 < 4.0) {
+                if (data.lux1 < 4.0) {
                     bLux.innerText = 'GELAP';
                     bLux.className = 'badge badge-danger';
                     pLux.style.backgroundColor = '#6366f1';
