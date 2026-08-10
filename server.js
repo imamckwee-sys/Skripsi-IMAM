@@ -10,7 +10,7 @@ app.use(express.static(path.join(__dirname)));
 let sensorData = {
     suhu1: 0, suhu2: 0,
     hum1: 0, hum2: 0,
-    lux1: 0,
+    lux: 0,
     gas1: 0, gas2: 0,
     kipas: false,
     penghangat: false,
