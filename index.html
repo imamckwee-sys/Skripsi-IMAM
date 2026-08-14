@@ -440,7 +440,7 @@
                     <div class="relay-status-row">
                         <div class="relay-info">
                             <h4>Kipas Exhaust</h4>
-                            <p>Suhu > 26 &deg;C ATAU Amonia > 700</p>
+                            <p>Suhu > 26 &deg;C ATAU Amonia > 25 ppm</p>
                         </div>
                         <div style="display: flex; align-items: center; gap: 8px;">
                             <div class="icon-wrapper" id="fan-icon-wrap" style="width: 32px; height: 32px; border-radius: 8px;">
@@ -520,7 +520,7 @@
                     </div>
                     <div class="threshold-item">
                         <span class="threshold-label">Kadar Gas Maks (MQ135 ADC)</span>
-                        <span class="threshold-value" style="color: #f87171;">700 ADC</span>
+                        <span class="threshold-value" style="color: #f87171;">25 ppm</span>
                     </div>
                 </div>
             </div>
@@ -657,7 +657,7 @@
                 let pctGas = (avgGas / 4095) * 100;
                 pGas.style.width = Math.min(100, Math.max(0, pctGas)) + '%';
                 
-                if (data.gas1 > 700 || data.gas2 > 700) {
+                if (data.gas1 > 25 || data.gas2 > 25) {
                     bGas.innerText = 'BAHAYA';
                     bGas.className = 'badge badge-danger';
                     pGas.style.backgroundColor = '#ef4444';
