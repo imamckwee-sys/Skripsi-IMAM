@@ -599,11 +599,11 @@
                 let pctSuhu = (avgSuhu / 40) * 100;
                 pSuhu.style.width = Math.min(100, Math.max(0, pctSuhu)) + '%';
                 
-                if (data.suhu1 < 24.0 || data.suhu2 < 24.0) {
+                if (data.suhu1 < 28.0 || data.suhu2 < 28.0) {
                     bSuhu.innerText = 'DINGIN';
                     bSuhu.className = 'badge badge-warning';
                     pSuhu.style.backgroundColor = '#fbbf24';
-                } else if (data.suhu1 > 26.0 || data.suhu2 > 26.0) {
+                } else if (data.suhu1 > 30.0 || data.suhu2 > 30.0) {
                     bSuhu.innerText = 'PANAS';
                     bSuhu.className = 'badge badge-danger';
                     pSuhu.style.backgroundColor = '#ef4444';
@@ -639,7 +639,7 @@
                 let pctLux = (avgLux / 100) * 100;
                 pLux.style.width = Math.min(100, Math.max(0, pctLux)) + '%';
                 
-                if (data.lux1 < 4.0) {
+                if (data.lux1 < 10.0) {
                     bLux.innerText = 'GELAP';
                     bLux.className = 'badge badge-danger';
                     pLux.style.backgroundColor = '#6366f1';
@@ -657,7 +657,7 @@
                 let pctGas = (avgGas / 4095) * 100;
                 pGas.style.width = Math.min(100, Math.max(0, pctGas)) + '%';
                 
-                if (data.gas1 > 25 || data.gas2 > 25) {
+                if (data.gas1 > 20 || data.gas2 > 20) {
                     bGas.innerText = 'BAHAYA';
                     bGas.className = 'badge badge-danger';
                     pGas.style.backgroundColor = '#ef4444';
